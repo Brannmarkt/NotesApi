@@ -50,7 +50,7 @@ public class NoteService : INoteService
             query = query.OrderByDescending(n => n.CreationDate);
         }
 
-        // 3. ПАГІНАЦІЯ
+        // 3. ПАГІНАЦІЯ  
         var pagedData = await query
             .Skip((options.PageNumber - 1) * options.PageSize)
             .Take(options.PageSize)
@@ -99,6 +99,7 @@ public class NoteService : INoteService
 
         _unitOfWork.Notes.Delete(note);
         await _unitOfWork.CompleteAsync();
+
         return new ServiceResult<bool>(ResultStatus.Success, true);
     }
 }
