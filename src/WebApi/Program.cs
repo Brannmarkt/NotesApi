@@ -6,8 +6,15 @@ using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
+using Serilog;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration) // Цей рядок зчитує appsettings.json
+    .CreateLogger();
 
 // Add services to the container.
 
@@ -26,11 +33,13 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddScoped<INoteService, NoteService>();
 
-
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddMaps(typeof(Application.Mappings.MappingProfile).Assembly);
 });
+
+builder.Host.UseSerilog();
+
 
 
 var app = builder.Build();
