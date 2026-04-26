@@ -1,17 +1,12 @@
-using Application.Interfaces;
-using Application.Mappings;
-using Application.Notes.Validators;
-using Application.Services;
+
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Persistence;
-using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using WebApi.Middleware;
 
 
 
@@ -40,17 +35,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 // 2. –еЇстрац≥€ репозитор≥њв та Unit of Work (Scoped Ч один екземпл€р на HTTP запит)
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<INoteRepository, NoteRepository>();
-builder.Services.AddScoped<INoteService, NoteService>();
 
+/*
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddMaps(typeof(Application.Mappings.MappingProfile).Assembly);
-});
+});*/
 
-builder.Services.AddValidatorsFromAssembly(typeof(CreateNoteValidator).Assembly);
-builder.Services.AddFluentValidationAutoValidation(); // јвтоматична перев≥рка перед входом у контролер
+//builder.Services.AddValidatorsFromAssembly(typeof(CreateNoteValidator).Assembly);
+builder.Services.AddFluentValidationAutoValidation(); 
 
 builder.Host.UseSerilog();
 
@@ -58,7 +51,7 @@ builder.Host.UseSerilog();
 
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionMiddleware>();
+//app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
