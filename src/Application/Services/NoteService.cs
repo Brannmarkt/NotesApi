@@ -4,6 +4,7 @@ using Application.Helpers;
 using Application.Interfaces;
 using AutoMapper;
 using Domain.Entities;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,13 @@ public class NoteService : INoteService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IValidator<CreateNoteDto> _validator;
 
-    public NoteService(IUnitOfWork unitOfWork, IMapper mapper)
+    public NoteService(IUnitOfWork unitOfWork, IMapper mapper, IValidator<CreateNoteDto> validator)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _validator = validator;
     }
 
     public async Task<ServiceResult<IEnumerable<NoteDto>>> GetAllAsync(NotesQueryOptions options)
@@ -46,11 +49,9 @@ public class NoteService : INoteService
         }
         else
         {
-            // Обов'язкове сортування за замовчуванням (важливо для стабільної пагінації)
             query = query.OrderByDescending(n => n.CreationDate);
         }
 
-        // 3. ПАГІНАЦІЯ  
         var pagedData = await query
             .Skip((options.PageNumber - 1) * options.PageSize)
             .Take(options.PageSize)
@@ -70,14 +71,29 @@ public class NoteService : INoteService
 
     public async Task<ServiceResult<NoteDto>> CreateAsync(CreateNoteDto dto)
     {
-        if (string.IsNullOrWhiteSpace(dto.Title))
-            return new ServiceResult<NoteDto>(ResultStatus.InvalidData, null, "Title is required");
+        // 1. Явно викликаємо валідацію
+        var validationResult = await _validator.ValidateAsync(dto);
+
+        if (!validationResult.IsValid)
+        {
+            // 2. Викидаємо помилку, яку зловить Middleware
+            throw new FluentValidation.ValidationException(validationResult.Errors);
+        }
 
         var entity = _mapper.Map<NoteEntity>(dto);
         await _unitOfWork.Notes.AddAsync(entity);
         await _unitOfWork.CompleteAsync();
 
         return new ServiceResult<NoteDto>(ResultStatus.Success, _mapper.Map<NoteDto>(entity));
+
+        /*if (string.IsNullOrWhiteSpace(dto.Title))
+            return new ServiceResult<NoteDto>(ResultStatus.InvalidData, null, "Title is required");
+
+        var entity = _mapper.Map<NoteEntity>(dto);
+        await _unitOfWork.Notes.AddAsync(entity);
+        await _unitOfWork.CompleteAsync();
+
+        return new ServiceResult<NoteDto>(ResultStatus.Success, _mapper.Map<NoteDto>(entity));*/
     }
 
     public async Task<ServiceResult<bool>> UpdateAsync(int id, CreateNoteDto dto)

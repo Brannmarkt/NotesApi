@@ -1,24 +1,35 @@
+using Application.Helpers.Validators;
 using Application.Interfaces;
 using Application.Mappings;
 using Application.Services;
+using AutoMapper;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using AutoMapper;
 using Serilog;
+using WebApi.Middleware;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration) // Цей рядок зчитує appsettings.json
+    .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -38,11 +49,16 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddMaps(typeof(Application.Mappings.MappingProfile).Assembly);
 });
 
+builder.Services.AddValidatorsFromAssembly(typeof(CreateNoteValidator).Assembly);
+builder.Services.AddFluentValidationAutoValidation(); // Автоматична перевірка перед входом у контролер
+
 builder.Host.UseSerilog();
 
 
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
