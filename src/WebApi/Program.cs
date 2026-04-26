@@ -1,6 +1,6 @@
-using Application.Helpers.Validators;
 using Application.Interfaces;
 using Application.Mappings;
+using Application.Notes.Validators;
 using Application.Services;
 using AutoMapper;
 using FluentValidation;

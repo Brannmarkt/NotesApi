@@ -1,6 +1,6 @@
 ﻿using Application.Common;
-using Application.DTOs;
 using Application.Helpers;
+using Application.Notes.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;

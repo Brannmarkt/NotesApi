@@ -23,17 +23,13 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
     {
         context.Response.ContentType = "application/json";
 
-        // 1. Визначаємо статус-код та повідомлення залежно від типу помилки
         var (statusCode, message, errors) = exception switch
         {
-            // Якщо помилка прийшла від FluentValidation
             ValidationException valEx => (
                 (int)HttpStatusCode.BadRequest,
                 "Validation Failed",
                 valEx.Errors.Select(e => new { Field = e.PropertyName, Error = e.ErrorMessage })
             ),
-
-            // Всі інші непередбачені помилки
             _ => (
                 (int)HttpStatusCode.InternalServerError,
                 "Internal Server Error. Please try again later.",
@@ -43,16 +39,17 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
 
         context.Response.StatusCode = statusCode;
 
-        // 2. Формуємо об'єкт відповіді
         var response = new
         {
             StatusCode = statusCode,
             Message = message,
-            Errors = errors, // Список конкретних полів (тільки для валідації)
-            Trace = env.IsDevelopment() ? exception.StackTrace : null
+            Errors = errors,
+            // Додаємо Trace ТІЛЬКИ якщо це не помилка валідації і ми в Dev-режимі
+            Trace = (exception is not ValidationException && env.IsDevelopment())
+                    ? exception.StackTrace
+                    : null
         };
 
-        // 3. Записуємо JSON безпосередньо у відповідь
         await context.Response.WriteAsJsonAsync(response);
     }
 }

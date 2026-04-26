@@ -1,7 +1,7 @@
 ﻿using Application.Common;
-using Application.DTOs;
 using Application.Helpers;
 using Application.Interfaces;
+using Application.Notes.DTOs;
 using AutoMapper;
 using Domain.Entities;
 using FluentValidation;

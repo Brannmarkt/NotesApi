@@ -1,4 +1,4 @@
-﻿using Application.DTOs;
+﻿using Application.Notes.DTOs;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Helpers.Validators;
+namespace Application.Notes.Validators;
 public class CreateNoteValidator : AbstractValidator<CreateNoteDto>
 {
     public CreateNoteValidator()
