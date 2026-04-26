@@ -17,9 +17,4 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.15" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Notes\Commands\" />
-    <Folder Include="Notes\Queries\" />
-  </ItemGroup>
-
 </Project>
