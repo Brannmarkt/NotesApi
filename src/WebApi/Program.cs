@@ -1,7 +1,9 @@
 
+using Application;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +36,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// 2. Реєстрація репозиторіїв та Unit of Work (Scoped — один екземпляр на HTTP запит)
+// 2. Реєстрація репозиторіїв та Unit of Work
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructureServices();
+
 
 /*
 builder.Services.AddAutoMapper(cfg =>

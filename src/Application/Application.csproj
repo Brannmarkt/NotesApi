@@ -19,11 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Common\" />
-    <Folder Include="Notes\Commands\" />
-    <Folder Include="Notes\DTOs\" />
-    <Folder Include="Notes\Queries\" />
+    <Folder Include="Notes\Queries\GetNoteById\" />
+    <Folder Include="Notes\Queries\GetNotes\" />
   </ItemGroup>
 
 </Project>
