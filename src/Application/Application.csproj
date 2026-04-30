@@ -19,8 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Notes\Queries\GetNoteById\" />
-    <Folder Include="Notes\Queries\GetNotes\" />
+    <Folder Include="Common\Filtering\" />
   </ItemGroup>
 
 </Project>

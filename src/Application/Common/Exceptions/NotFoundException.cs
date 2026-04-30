@@ -5,6 +5,26 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.Common.Exceptions;
-internal class NotFoundException
+public class NotFoundException : Exception
 {
+    public NotFoundException()
+        : base()
+    {
+    }
+
+    public NotFoundException(string message)
+        : base(message)
+    {
+    }
+
+    public NotFoundException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
+
+    // Зручний конструктор для Clean Architecture
+    public NotFoundException(string name, object key)
+        : base($"Сутність \"{name}\" ({key}) не знайдена.")
+    {
+    }
 }

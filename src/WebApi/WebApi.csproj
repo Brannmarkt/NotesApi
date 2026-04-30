@@ -27,10 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Extensions\" />
     <Folder Include="Middleware\" />
-    <Folder Include="Contracts\" />
-    <Folder Include="Mappings\" />
   </ItemGroup>
 
 </Project>
