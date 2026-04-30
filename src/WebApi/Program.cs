@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using WebApi.Common;
 
 
 
@@ -36,23 +37,16 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// 2. Реєстрація репозиторіїв та Unit of Work
+// 2. Реєстрація сервісів проектів
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices();
 
+// 3. Exception handling
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails(); // Додає підтримку стандартних об'єктів помилок
 
-/*
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.AddMaps(typeof(Application.Mappings.MappingProfile).Assembly);
-});*/
-
-//builder.Services.AddValidatorsFromAssembly(typeof(CreateNoteValidator).Assembly);
-builder.Services.AddFluentValidationAutoValidation(); 
 
 builder.Host.UseSerilog();
-
-
 
 var app = builder.Build();
 
@@ -64,6 +58,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Використовуємо Middleware, який викликає нашExceptionHandler
+app.UseStatusCodePages(); // Додає текст до стандартних статус-кодів (напр. 404)
+app.UseExceptionHandler(); // Цей рядок обов'язковий
 
 app.UseHttpsRedirection();
 
