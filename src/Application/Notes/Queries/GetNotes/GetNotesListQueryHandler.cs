@@ -20,19 +20,33 @@ public class GetNotesListQueryHandler : IRequestHandler<GetNotesListQuery, Pagin
 
     public async Task<PaginatedList<NoteDto>> Handle(GetNotesListQuery request, CancellationToken cancellationToken)
     {
-        Expression<Func<NoteEntity, bool>>? filter = string.IsNullOrWhiteSpace(request.SearchTerm)
-            ? null
-            : n => n.Title.ToLower().Contains(request.SearchTerm.ToLower())
-                || n.Text.ToLower().Contains(request.SearchTerm.ToLower());
+        var query = _unitOfWork.Notes.GetAll();
 
+        // 1. Фільтрація
+        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+        {
+            query = query.Where(n => n.Title.Contains(request.SearchTerm) ||
+                                    n.Text.Contains(request.SearchTerm));
+        }
+
+        // 2. Сортування
+        query = query.OrderByDescending(n => n.CreationDate);
+
+        // 3. Отримання даних з репозиторію (повертає Items та TotalCount)
         var (items, totalCount) = await _unitOfWork.Notes.GetPagedAsync(
+            query,
             request.PageNumber,
             request.PageSize,
-            filter, // Передаємо сформований фільтр
             cancellationToken);
 
+        // 4. Мапимо тільки список сутностей у список DTO
         var dtos = _mapper.Map<IReadOnlyCollection<NoteDto>>(items);
 
-        return new PaginatedList<NoteDto>(dtos, totalCount, request.PageNumber, request.PageSize);
+        // 5. Вручну створюємо PaginatedList (AutoMapper тут не потрібен)
+        return new PaginatedList<NoteDto>(
+            dtos,
+            totalCount,
+            request.PageNumber,
+            request.PageSize);
     }
 }

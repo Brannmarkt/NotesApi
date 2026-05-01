@@ -22,7 +22,7 @@ public class GenericRepository<T>/*(AppDbContext context)*/ : IGenericRepository
         _dbSet = context.Set<T>();
     }
 
-    public IQueryable<T> GetQueryable() => _dbSet.AsNoTracking();
+    public IQueryable<T> GetAll() => _dbSet.AsNoTracking();
 
     public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken)
         => await _dbSet.FindAsync(new object[] { id }, cancellationToken);
@@ -40,6 +40,22 @@ public class GenericRepository<T>/*(AppDbContext context)*/ : IGenericRepository
         var items = await query.Skip((pageNumber - 1) * pageSize)
                                .Take(pageSize)
                                .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
+    }
+
+    public async Task<(IEnumerable<T> Items, int TotalCount)> GetPagedAsync(
+    IQueryable<T> query,
+    int pageNumber,
+    int pageSize,
+    CancellationToken cancellationToken = default)
+    {
+        int totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
 
         return (items, totalCount);
     }

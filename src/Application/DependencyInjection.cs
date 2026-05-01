@@ -11,17 +11,18 @@ public static class DependencyInjection
     {
         var assembly = Assembly.GetExecutingAssembly();
 
-        // 1. Реєструємо AutoMapper
+        // Реєструємо AutoMapper
         services.AddAutoMapper(cfg => cfg.AddMaps(assembly));
 
-        // 2. Реєструємо MediatR    Це навчить програму шукати всі Handlers у нашому проекті Application
-        services.AddMediatR(cfg => {
+        // Реєструємо MediatR    Це навчить програму шукати всі Handlers у нашому проекті Application
+        services.AddMediatR(cfg => 
+        {
             cfg.RegisterServicesFromAssembly(assembly);
-
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         });
 
-        // 3. Реєстрація всіх валідаторів
+        // Реєстрація всіх валідаторів
         services.AddValidatorsFromAssembly(assembly);
 
         return services;

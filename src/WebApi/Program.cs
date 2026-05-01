@@ -11,9 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using WebApi.Common;
 
-
+Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)

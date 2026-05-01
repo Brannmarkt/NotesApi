@@ -15,8 +15,13 @@ public interface IGenericRepository<T> where T : class
         int pageSize,
         Expression<Func<T, bool>>? filter = null,
         CancellationToken cancellationToken = default);
-    public IQueryable<T> GetQueryable();
+    Task<(IEnumerable<T> Items, int TotalCount)> GetPagedAsync(
+    IQueryable<T> query, // Новий параметр
+    int pageNumber,
+    int pageSize,
+    CancellationToken cancellationToken = default);
 
+    public IQueryable<T> GetAll();
     Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken);
     Task AddAsync(T entity, CancellationToken cancellationToken);
     void Update(T entity);

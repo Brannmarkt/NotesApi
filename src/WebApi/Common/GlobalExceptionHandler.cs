@@ -18,7 +18,7 @@ public class GlobalExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
+        _logger.LogError(exception, "Exception occurred: {Message} at {Path}" , exception.Message, httpContext.Request.Path);
 
         // Визначаємо статус-код та заголовок залежно від типу помилки
         var (statusCode, title) = exception switch

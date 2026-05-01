@@ -1,6 +1,8 @@
-﻿using Application.Interfaces;
+﻿using Application.Common.Exceptions;
+using Application.Interfaces;
 using Application.Notes.DTOs;
 using AutoMapper;
+using Domain.Entities;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -29,7 +31,8 @@ public class GetNoteByIdQueryHandler : IRequestHandler<GetNoteByIdQuery, NoteDto
         // (WebApi контролер пізніше перетворить цей null у відповідь 404 Not Found)
         if (note == null)
         {
-            return null;
+            throw new NotFoundException(nameof(NoteEntity), request.Id);
+            //return null;
         }
 
         // 3. Мапимо сутність у DTO
