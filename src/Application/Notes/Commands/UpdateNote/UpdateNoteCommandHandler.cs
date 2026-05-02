@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.Common.Exceptions;
+using Application.Interfaces;
+using Domain.Entities;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -7,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.Notes.Commands.UpdateNote;
-public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, bool>
+public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -16,14 +18,14 @@ public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, bool>
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<bool> Handle(UpdateNoteCommand request, CancellationToken cancellationToken)
+    public async Task Handle(UpdateNoteCommand request, CancellationToken cancellationToken)
     {
         // 1. Отримуємо нотатку з репозиторію
         var note = await _unitOfWork.Notes.GetByIdAsync(request.Id, cancellationToken);
 
         if (note == null)
         {
-            return false; // Або кинути NotFoundException
+            throw new NotFoundException(nameof(NoteEntity), request.Id);
         }
 
         // 2. Оновлюємо поля
@@ -36,7 +38,5 @@ public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, bool>
 
         // 4. Зберігаємо зміни
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return true;
     }
 }

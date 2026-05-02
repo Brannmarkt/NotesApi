@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.Common.Exceptions;
+using Application.Interfaces;
+using Domain.Entities;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -7,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.Notes.Commands.DeleteNote;
-public class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand, bool>
+public class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -16,18 +18,16 @@ public class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand, bool>
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<bool> Handle(DeleteNoteCommand request, CancellationToken cancellationToken)
+    public async Task Handle(DeleteNoteCommand request, CancellationToken cancellationToken)
     {
         var note = await _unitOfWork.Notes.GetByIdAsync(request.Id, cancellationToken);
 
         if (note == null)
         {
-            return false;
+            throw new NotFoundException(nameof(NoteEntity), request.Id);
         }
 
         _unitOfWork.Notes.Delete(note);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return true;
     }
 }

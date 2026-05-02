@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.Notes.Commands.UpdateNote;
-public class UpdateNoteCommand : IRequest<bool>
+public class UpdateNoteCommand : IRequest
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;

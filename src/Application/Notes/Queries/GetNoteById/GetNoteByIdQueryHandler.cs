@@ -22,7 +22,7 @@ public class GetNoteByIdQueryHandler : IRequestHandler<GetNoteByIdQuery, NoteDto
         _mapper = mapper;
     }
 
-    async Task<NoteDto?> IRequestHandler<GetNoteByIdQuery, NoteDto?>.Handle(GetNoteByIdQuery request, CancellationToken cancellationToken)
+    public async Task<NoteDto?> Handle(GetNoteByIdQuery request, CancellationToken cancellationToken)
     {
         // 1. Отримуємо сутність за ID
         var note = await _unitOfWork.Notes.GetByIdAsync(request.Id, cancellationToken);
